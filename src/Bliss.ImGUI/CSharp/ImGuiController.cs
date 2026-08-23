@@ -295,7 +295,7 @@ public class ImGuiController : Disposable {
         int vertexOffset = 0;
         uint indexOffset = 0;
         
-        for (int i = 0; i < drawData.CmdListsCount; i++) {
+        for (int i = 0; i < drawData.CmdLists.Size; i++) {
             ImDrawListPtr cmdList = drawData.CmdLists[i];
             
             this._commandList.UpdateBuffer(this._vertexBuffer, (uint) (vertexOffset * sizeof(ImDrawVert)), new ReadOnlySpan<ImDrawVert>(cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size));
@@ -318,7 +318,7 @@ public class ImGuiController : Disposable {
         vertexOffset = 0;
         indexOffset = 0;
         
-        for (int i = 0; i < drawData.CmdListsCount; i++) {
+        for (int i = 0; i < drawData.CmdLists.Size; i++) {
             ImDrawListPtr cmdList = drawData.CmdLists[i];
             
             uint cmdListIndexOffset = indexOffset;
