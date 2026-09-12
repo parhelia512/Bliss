@@ -284,9 +284,26 @@ public static class Input {
     }
 
     /// <summary>
+    /// Retrieves the unique identifiers for all gamepads currently available through the input context.
+    /// </summary>
+    /// <returns>An enumerable collection of gamepad identifiers.</returns>
+    public static IEnumerable<uint> GetAvailableGamepads() {
+        return InputContext.GetAvailableGamepads();
+    }
+
+    /// <summary>
+    /// Retrieves the first available gamepad, if any, and returns its identifier.
+    /// </summary>
+    /// <param name="gamepad">The identifier of the first available gamepad, if found.</param>
+    /// <returns>True if a gamepad is available; otherwise, false.</returns>
+    public static bool GetFirstAvailableGamepad(out uint gamepad) {
+        return InputContext.GetFirstAvailableGamepad(out gamepad);
+    }
+
+    /// <summary>
     /// Checks if the specified gamepad is available.
     /// </summary>
-    /// <param name="gamepad">The index of the gamepad to check.</param>
+    /// <param name="gamepad">The identifier of the gamepad to check.</param>
     /// <returns>True if the gamepad is available; otherwise, false.</returns>
     public static bool IsGamepadAvailable(uint gamepad) {
         return InputContext.IsGamepadAvailable(gamepad);
@@ -295,7 +312,7 @@ public static class Input {
     /// <summary>
     /// Gets the name of the specified gamepad.
     /// </summary>
-    /// <param name="gamepad">The index of the gamepad.</param>
+    /// <param name="gamepad">The identifier of the gamepad.</param>
     /// <returns>The name of the specified gamepad.</returns>
     public static string GetGamepadName(uint gamepad) {
         return InputContext.GetGamepadName(gamepad);
@@ -304,7 +321,7 @@ public static class Input {
     /// <summary>
     /// Generates a rumble effect on the specified gamepad.
     /// </summary>
-    /// <param name="gamepad">The index of the gamepad to rumble.</param>
+    /// <param name="gamepad">The identifier of the gamepad to rumble.</param>
     /// <param name="lowFrequencyRumble">The intensity of the low-frequency rumble.</param>
     /// <param name="highFrequencyRumble">The intensity of the high-frequency rumble.</param>
     /// <param name="durationMs">Duration of the rumble effect in milliseconds.</param>
@@ -315,7 +332,7 @@ public static class Input {
     /// <summary>
     /// Retrieves the movement value of the specified axis on the given gamepad.
     /// </summary>
-    /// <param name="gamepad">The index of the gamepad.</param>
+    /// <param name="gamepad">The identifier of the gamepad.</param>
     /// <param name="axis">The axis of the gamepad to check.</param>
     /// <returns>The movement value of the specified axis.</returns>
     public static float GetGamepadAxisMovement(uint gamepad, GamepadAxis axis) {
@@ -335,7 +352,7 @@ public static class Input {
     /// <summary>
     /// Checks if a specific gamepad button is currently pressed.
     /// </summary>
-    /// <param name="gamepad">The ID of the gamepad to check.</param>
+    /// <param name="gamepad">The identifier of the gamepad to check.</param>
     /// <param name="button">The gamepad button to check.</param>
     /// <returns>True if the button is pressed, otherwise false.</returns>
     public static bool IsGamepadButtonDown(uint gamepad, GamepadButton button) {

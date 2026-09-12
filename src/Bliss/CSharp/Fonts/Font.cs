@@ -61,7 +61,7 @@ public class Font : Disposable {
     /// </summary>
     /// <param name="fontSize">The desired font size for the retrieved sprite font.</param>
     /// <returns>A <see cref="DynamicSpriteFont"/> instance corresponding to the specified font size.</returns>
-    public DynamicSpriteFont GetSpriteFont(float fontSize) {
+    public SpriteFontBase GetSpriteFont(float fontSize) {
         return this.FontSystem.GetFont(fontSize);
     }
 

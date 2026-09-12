@@ -272,16 +272,30 @@ public class Sdl3InputContext : Disposable, IInputContext {
     public uint GetAvailableGamepadCount() {
         return (uint) this._gamepads.Count;
     }
+
+    public IEnumerable<uint> GetAvailableGamepads() {
+        return this._gamepads.Keys;
+    }
+    
+    public bool GetFirstAvailableGamepad(out uint gamepad) {
+        if (this._gamepads.Count > 0) {
+            gamepad = this._gamepads.Keys.First();
+            return true;
+        }
+        
+        gamepad = 0;
+        return false;
+    }
     
     public bool IsGamepadAvailable(uint gamepad) {
-        return gamepad <= this._gamepads.Count - 1;
+        return this._gamepads.ContainsKey(gamepad);
     }
 
     public string GetGamepadName(uint gamepad) {
         return this._gamepads[gamepad].GetName();
     }
 
-    public unsafe void RumbleGamepad(uint gamepad, ushort lowFrequencyRumble, ushort highFrequencyRumble, uint durationMs) {
+    public void RumbleGamepad(uint gamepad, ushort lowFrequencyRumble, ushort highFrequencyRumble, uint durationMs) {
         SDL.RumbleGamepad(this._gamepads[gamepad].GetHandle(), lowFrequencyRumble, highFrequencyRumble, durationMs);
     }
 
@@ -391,7 +405,7 @@ public class Sdl3InputContext : Disposable, IInputContext {
     /// <param name="which">The identifier of the newly added gamepad.</param>
     private void OnGamepadAdded(uint which) {
         Sdl3Gamepad gamepad = new Sdl3Gamepad(this._window, which);
-        this._gamepads.Add(gamepad.GetIndex(), gamepad);
+        this._gamepads.Add(gamepad.GetInstanceId(), gamepad);
     }
 
     /// <summary>

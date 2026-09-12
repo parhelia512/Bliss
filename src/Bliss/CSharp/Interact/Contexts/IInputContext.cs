@@ -206,6 +206,19 @@ public interface IInputContext : IDisposable {
     uint GetAvailableGamepadCount();
 
     /// <summary>
+    /// Retrieves the identifiers of all currently available gamepads.
+    /// </summary>
+    /// <returns>An enumerable list of unique gamepad identifiers.</returns>
+    IEnumerable<uint> GetAvailableGamepads();
+
+    /// <summary>
+    /// Retrieves the first available gamepad and its identifier.
+    /// </summary>
+    /// <param name="gamepad">The identifier of the first available gamepad if one is found.</param>
+    /// <returns>True if a gamepad is available; otherwise, false.</returns>
+    bool GetFirstAvailableGamepad(out uint gamepad);
+    
+    /// <summary>
     /// Checks if the specified gamepad is available.
     /// </summary>
     /// <param name="gamepad">The index of the gamepad to check.</param>

@@ -12,7 +12,7 @@ public interface IGamepad : IDisposable {
     /// Gets the index of the gamepad.
     /// </summary>
     /// <returns>An unsigned integer representing the gamepad's index.</returns>
-    uint GetIndex();
+    uint GetInstanceId();
 
     /// <summary>
     /// Gets the handle of the gamepad.

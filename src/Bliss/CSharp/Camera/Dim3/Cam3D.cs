@@ -87,6 +87,13 @@ public class Cam3D : Disposable, ICam {
     public float MouseSensitivity;
 
     /// <summary>
+    /// Determines the sensitivity of the gamepad input when controlling the camera's movement or rotation.
+    /// Adjusting this value influences how responsive the camera is to gamepad interactions.
+    /// Used in scenarios where the camera is manipulated using joystick or trigger inputs.
+    /// </summary>
+    public float GamepadSensitivity;
+
+    /// <summary>
     /// Specifies the speed at which the camera can move within the scene.
     /// Adjust this value to control how fast the camera translates in the 3D space.
     /// Typically used in conjunction with user input to navigate the scene.
@@ -152,6 +159,7 @@ public class Cam3D : Disposable, ICam {
         this.NearPlane = nearPlane;
         this.FarPlane = farPlane;
         this.MouseSensitivity = 0.05F;
+        this.GamepadSensitivity = 1.0F;
         this.MovementSpeed = 10.0F;
         this.OrbitalSpeed = 0.5F;
         this._frustum = new Frustum();
@@ -161,8 +169,8 @@ public class Cam3D : Disposable, ICam {
     
     public void Update(double delta) {
         switch (this.Mode) {
-            case CameraMode.Free:
-                if (!Input.IsGamepadAvailable(0)) {
+            case CameraMode.Free: {
+                if (!Input.GetFirstAvailableGamepad(out uint gamepad)) {
                     this.SetYaw(this.GetYaw() - (Input.GetMouseDelta().X * this.MouseSensitivity), false);
                     this.SetPitch(this.GetPitch() - (Input.GetMouseDelta().Y * this.MouseSensitivity), false);
                     
@@ -177,6 +185,7 @@ public class Cam3D : Disposable, ICam {
                     if (Input.IsKeyDown(KeyboardKey.A)) {
                         this.MoveRight(-this.MovementSpeed * (float) delta, true);
                     }
+                    
                     if (Input.IsKeyDown(KeyboardKey.D)) {
                         this.MoveRight(this.MovementSpeed * (float) delta, true);
                     }
@@ -190,62 +199,67 @@ public class Cam3D : Disposable, ICam {
                     }
                 }
                 else {
-                    this.SetYaw(this.GetYaw() - (Input.GetGamepadAxisMovement(0, GamepadAxis.RightX) * 6) * this.MouseSensitivity * (float) delta, false);
-                    this.SetPitch(this.GetPitch() - (Input.GetGamepadAxisMovement(0, GamepadAxis.RightY) * 6) * this.MouseSensitivity * (float) delta, false);
+                    this.SetYaw(this.GetYaw() - Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightX) * this.GamepadSensitivity * 100 * (float) delta, false);
+                    this.SetPitch(this.GetPitch() - Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightY) * this.GamepadSensitivity * 100 * (float) delta, false);
                     
-                    this.MoveForward(this.MovementSpeed * Input.GetGamepadAxisMovement(0, GamepadAxis.TriggerRight) * (float) delta, false);
-                    this.MoveForward(-this.MovementSpeed * Input.GetGamepadAxisMovement(0, GamepadAxis.TriggerLeft) * (float) delta, false);
+                    this.MoveForward(this.MovementSpeed * Input.GetGamepadAxisMovement(gamepad, GamepadAxis.TriggerRight) * (float) delta, false);
+                    this.MoveForward(-this.MovementSpeed * Input.GetGamepadAxisMovement(gamepad, GamepadAxis.TriggerLeft) * (float) delta, false);
                     
-                    if (Input.IsGamepadButtonDown(0, GamepadButton.RightShoulder)) {
+                    if (Input.IsGamepadButtonDown(gamepad, GamepadButton.RightShoulder)) {
                         this.MoveRight(this.MovementSpeed * (float) delta, true);
                     }
                     
-                    if (Input.IsGamepadButtonDown(0, GamepadButton.LeftShoulder)) {
+                    if (Input.IsGamepadButtonDown(gamepad, GamepadButton.LeftShoulder)) {
                         this.MoveRight(-this.MovementSpeed * (float) delta, true);
                     }
                     
-                    if (Input.IsGamepadButtonDown(0, GamepadButton.RightStick)) {
+                    if (Input.IsGamepadButtonDown(gamepad, GamepadButton.RightStick)) {
                         this.MoveUp(this.MovementSpeed * (float) delta);
                     }
                     
-                    if (Input.IsGamepadButtonDown(0, GamepadButton.LeftStick)) {
+                    if (Input.IsGamepadButtonDown(gamepad, GamepadButton.LeftStick)) {
                         this.MoveUp(-this.MovementSpeed * (float) delta);
                     }
                 }
+                
                 break;
-            
-            case CameraMode.Orbital:
+            }
+            case CameraMode.Orbital: {
                 Matrix4x4 rotation = Matrix4x4.CreateFromAxisAngle(this.Up, this.OrbitalSpeed * (float) delta);
                 Vector3 view = this.Position - this.Target;
                 Vector3 transform = Vector3.Transform(view, rotation);
                 this.Position = this.Target + transform;
-
+                
                 if (Input.IsMouseScrolling(out Vector2 wheelDelta)) {
                     this.MoveToTarget(-wheelDelta.Y);
                 }
+                
                 break;
-            
-            case CameraMode.FirstPerson:
-                if (!Input.IsGamepadAvailable(0)) {
+            }
+            case CameraMode.FirstPerson: {
+                if (!Input.GetFirstAvailableGamepad(out uint gamepad)) {
                     this.SetYaw(this.GetYaw() - (Input.GetMouseDelta().X * this.MouseSensitivity), false);
                     this.SetPitch(this.GetPitch() - (Input.GetMouseDelta().Y * this.MouseSensitivity), false);
                 }
                 else {
-                    this.SetYaw(this.GetYaw() - (Input.GetGamepadAxisMovement(0, GamepadAxis.RightX) * 6) * this.MouseSensitivity * (float) delta, false);
-                    this.SetPitch(this.GetPitch() - (Input.GetGamepadAxisMovement(0, GamepadAxis.RightY) * 6) * this.MouseSensitivity * (float) delta, false);
+                    this.SetYaw(this.GetYaw() - Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightX) * this.GamepadSensitivity * 100 * (float) delta, false);
+                    this.SetPitch(this.GetPitch() - Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightY) * this.GamepadSensitivity * 100 * (float) delta, false);
                 }
+                
                 break;
-            
-            case CameraMode.ThirdPerson:
-                if (!Input.IsGamepadAvailable(0)) {
+            }
+            case CameraMode.ThirdPerson: {
+                if (!Input.GetFirstAvailableGamepad(out uint gamepad)) {
                     this.SetYaw(this.GetYaw() - (Input.GetMouseDelta().X * this.MouseSensitivity), true);
                     this.SetPitch(this.GetPitch() - (Input.GetMouseDelta().Y * this.MouseSensitivity), true);
                 }
                 else {
-                    this.SetYaw(this.GetYaw() + (Input.GetGamepadAxisMovement(0, GamepadAxis.RightX) * 6) * this.MouseSensitivity * (float) delta, true);
-                    this.SetPitch(this.GetPitch() + (Input.GetGamepadAxisMovement(0, GamepadAxis.RightY) * 6) * this.MouseSensitivity * (float) delta, true);
+                    this.SetYaw(this.GetYaw() + Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightX) * this.GamepadSensitivity * 100 * (float) delta, true);
+                    this.SetPitch(this.GetPitch() + Input.GetGamepadAxisMovement(gamepad, GamepadAxis.RightY) * this.GamepadSensitivity * 100 * (float) delta, true);
                 }
+                
                 break;
+            }
         }
     }
 

@@ -18,7 +18,7 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// <summary>
     /// Stores the index of the gamepad controller.
     /// </summary>
-    private uint _gamepadIndex;
+    private uint _gamepadInstanceId;
     
     /// <summary>
     /// The name of the gamepad, or "Unknown" if the name cannot be retrieved.
@@ -50,11 +50,11 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// Initializes a new instance of the <see cref="Sdl3Gamepad"/> class, which manages gamepad input for a specific window.
     /// </summary>
     /// <param name="window">The window associated with the gamepad.</param>
-    /// <param name="index">The index of the gamepad to be opened.</param>
-    public Sdl3Gamepad(IWindow window, uint index) {
+    /// <param name="instanceId">The instanceId of the gamepad to be opened.</param>
+    public Sdl3Gamepad(IWindow window, uint instanceId) {
         this.Window = window;
-        this._sdlGamepad = SDL.OpenGamepad(index);
-        this._gamepadIndex = SDL.GetJoystickID(SDL.GetGamepadJoystick(this._sdlGamepad));
+        this._sdlGamepad = SDL.OpenGamepad(instanceId);
+        this._gamepadInstanceId = SDL.GetJoystickID(SDL.GetGamepadJoystick(this._sdlGamepad));
         this._name = SDL.GetGamepadName(this._sdlGamepad) ?? "Unknown";
         
         this._joystickAxis = new Dictionary<SDL.GamepadAxis, float>();
@@ -72,8 +72,8 @@ public class Sdl3Gamepad : Disposable, IGamepad {
         return this._name;
     }
 
-    public uint GetIndex() {
-        return this._gamepadIndex;
+    public uint GetInstanceId() {
+        return this._gamepadInstanceId;
     }
 
     public nint GetHandle() {
@@ -113,7 +113,7 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// <param name="axis">The specific axis that was moved.</param>
     /// <param name="value">The new value of the axis movement.</param>
     private void OnGamepadAxisMoved(uint which, GamepadAxis axis, short value) {
-        if (which == this._gamepadIndex) {
+        if (which == this._gamepadInstanceId) {
             this._joystickAxis[this.MapGamepadAxis(axis)] = this.NormalizeJoystickAxis(value);
         }
     }
@@ -121,10 +121,10 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// <summary>
     /// Handles the event when a gamepad button is pressed down.
     /// </summary>
-    /// <param name="which">The index of the gamepad controller.</param>
+    /// <param name="which">The identifier of the gamepad controller.</param>
     /// <param name="button">The button on the gamepad that was pressed.</param>
     private void OnGamepadButtonDown(uint which, GamepadButton button) {
-        if (which == this._gamepadIndex) {
+        if (which == this._gamepadInstanceId) {
             this._buttonsPressed.Add(this.MapGamepadButton(button));
             this._buttonsDown.Add(this.MapGamepadButton(button));
         }
@@ -133,10 +133,10 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// <summary>
     /// Handles the event when a gamepad button is released.
     /// </summary>
-    /// <param name="which">The index of the gamepad that triggered the event.</param>
+    /// <param name="which">The identifier of the gamepad that triggered the event.</param>
     /// <param name="button">The button that was released.</param>
     private void OnGamepadButtonUp(uint which, GamepadButton button) {
-        if (which == this._gamepadIndex) {
+        if (which == this._gamepadInstanceId) {
             this._buttonsDown.Remove(this.MapGamepadButton(button));
             this._buttonsReleased.Add(this.MapGamepadButton(button));
         }
