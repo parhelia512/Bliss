@@ -6,6 +6,13 @@ namespace Bliss.CSharp.Interact.Gamepads;
 public class Sdl3Gamepad : Disposable, IGamepad {
     
     /// <summary>
+    /// Represents the minimum threshold value for axis movement on the gamepad that must be exceeded
+    /// for the movement to be recognized. Values below this deadzone are ignored to reduce unintentional input
+    /// caused by slight stick drift or noise.
+    /// </summary>
+    private const float AxisDeadzone = 0.1F;
+    
+    /// <summary>
     /// Gets the window associated with the gamepad.
     /// </summary>
     public IWindow Window { get; private set; }
@@ -148,9 +155,10 @@ public class Sdl3Gamepad : Disposable, IGamepad {
     /// <param name="value">The raw value of the joystick axis.</param>
     /// <returns>The normalized value of the joystick axis.</returns>
     private float NormalizeJoystickAxis(short value) {
-        return value < 0 ? -(value / (float) short.MinValue) : (value / (float) short.MaxValue);
+        float normalized = value < 0 ? -(value / (float) short.MinValue) : value / (float) short.MaxValue;
+        return MathF.Abs(normalized) < AxisDeadzone ? 0.0F : normalized;
     }
-    
+
     /// <summary>
     /// Maps a GamepadAxis to the corresponding SDL_GamepadAxis.
     /// </summary>
