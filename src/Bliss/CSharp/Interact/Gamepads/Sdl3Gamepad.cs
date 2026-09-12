@@ -6,9 +6,7 @@ namespace Bliss.CSharp.Interact.Gamepads;
 public class Sdl3Gamepad : Disposable, IGamepad {
     
     /// <summary>
-    /// Represents the minimum threshold value for axis movement on the gamepad that must be exceeded
-    /// for the movement to be recognized. Values below this deadzone are ignored to reduce unintentional input
-    /// caused by slight stick drift or noise.
+    /// Represents the threshold value used to ignore minor joystick axis movements that are deemed unintended or insignificant.
     /// </summary>
     private const float AxisDeadzone = 0.1F;
     
